@@ -6,7 +6,7 @@ import { each } from 'lodash'
 import Preloader from './components/Preloader'
 import Navigation from './components/Navigation'
 import Canvas from './components/Canvas'
-
+import NormalizeWheel from 'normalize-wheel'
 class App {
   constructor () {
     this.createContent()
@@ -36,7 +36,9 @@ class App {
   }
 
   createCanvas () {
-    this.canvas = new Canvas()
+    this.canvas = new Canvas({
+      template: this.template
+    })
   }
 
   createContent () {
@@ -64,6 +66,7 @@ class App {
   }
 
   async onChange (url) {
+    await this.canvas.onChangeStart(this.template)
     await this.page.hide()
     const request = await window.fetch(url)
     if (request.status === 200) {
@@ -74,11 +77,11 @@ class App {
 
       const divContent = div.querySelector('.content')
       this.template = divContent.getAttribute('data-template')
-
       this.navigation.onChange(this.template)
 
       this.content.setAttribute('data-template', this.template)
       this.content.innerHTML = divContent.innerHTML
+      this.canvas.onChangeEnd(this.template)
       this.page = this.pages[this.template]
       this.page.create()
       this.onResize()
@@ -107,6 +110,18 @@ class App {
     }
   }
 
+  onWheel (e) {
+    const normalizedWheel = NormalizeWheel(e)
+
+    if (this.canvas && this.canvas.onWheel) {
+      this.canvas.onWheel(normalizedWheel)
+    }
+
+    if (this.page && this.page.onWheel) {
+      this.page.onWheel(normalizedWheel)
+    }
+  }
+
   onResize () {
     window.requestAnimationFrame((_) => {
       if (this.canvas && this.canvas.onResize) {
@@ -119,11 +134,11 @@ class App {
   }
 
   update () {
-    if (this.canvas && this.canvas.update) {
-      this.canvas.update(this.page.scroll)
-    }
     if (this.page && this.page.update) {
       this.page.update()
+    }
+    if (this.canvas && this.canvas.update) {
+      this.canvas.update(this.page.scroll)
     }
     this.frame = window.requestAnimationFrame(this.update.bind(this))
   }
@@ -132,7 +147,7 @@ class App {
     window.addEventListener('mousedown', this.onTouchDown.bind(this))
     window.addEventListener('mousemove', this.onTouchMove.bind(this))
     window.addEventListener('mouseup', this.onTouchUp.bind(this))
-
+    window.addEventListener('mousewheel', this.onWheel.bind(this))
     window.addEventListener('touchstart', this.onTouchDown.bind(this))
     window.addEventListener('touchmove', this.onTouchMove.bind(this))
     window.addEventListener('touchend', this.onTouchUp.bind(this))

@@ -3,7 +3,7 @@ extends ../base.pug
 block variables
   - var template = 'about'
 
-block content
+block content 
   .about(data-background="#b2b8c3" data-color="#37384c")
     .about__wrapper
       section.about__gallery
@@ -33,7 +33,7 @@ block content
               if section.primary.label
                 p.about__highlight__label(data-animation="label")=section.primary.label
 
-              h3.about__highlight__title(data-animation="highlight")=section.primary.title
+              h3.about__highlight__title(data-animation='highlight')=section.primary.title
 
               each media in section.items
                 figure.about__highlight__media
