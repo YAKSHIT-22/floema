@@ -86,29 +86,39 @@ export default class Media {
     this.updateY(0)
   }
 
+  updateRotation () {
+    this.mesh.rotation.z = GSAP.utils.mapRange(-this.sizes.width / 2, this.sizes.width / 2, Math.PI * 0.1, -Math.PI * 0.1, this.mesh.position.x)
+  }
+
   updateScale () {
     this.height = this.bounds.height / window.innerHeight
     this.width = this.bounds.width / window.innerWidth
 
     this.mesh.scale.x = this.sizes.width * this.width
     this.mesh.scale.y = this.sizes.height * this.height
+
+    const scale = GSAP.utils.mapRange(0, this.sizes.width / 2, 0.05, 0, Math.abs(this.mesh.position.x))
+    this.mesh.scale.x += scale
+    this.mesh.scale.y += scale
   }
 
   updateX (x = 0) {
     this.x = (this.bounds.left + x) / window.innerWidth
 
-    this.mesh.position.x = (-this.sizes.width / 2) + (this.mesh.scale.x / 2) + (this.x * this.sizes.width) + this.extra // prettier-ignore
+    this.mesh.position.x = (-this.sizes.width / 2) + (this.mesh.scale.x / 2) + (this.x * this.sizes.width) + this.extra
   }
 
   updateY (y = 0) {
     this.y = (this.bounds.top + y) / window.innerHeight
 
-    this.mesh.position.y = (this.sizes.height / 2) - (this.mesh.scale.y / 2) - (this.y * this.sizes.height) // prettier-ignore
+    this.mesh.position.y = (this.sizes.height / 2) - (this.mesh.scale.y / 2) - (this.y * this.sizes.height)
+    this.mesh.position.y += Math.cos((this.mesh.position.x / this.sizes.width) * Math.PI * 0.1) * 58 - 58
   }
 
   update (scroll) {
     if (!this.bounds) return
-
+    this.updateRotation()
+    this.updateScale()
     this.updateX(scroll)
     this.updateY(0)
   }
