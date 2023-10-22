@@ -45,7 +45,10 @@ export default class {
   }
 
   createGeometry () {
-    this.geometry = new Plane(this.gl)
+    this.geometry = new Plane(this.gl, {
+      widthSegments: 20,
+      heightSegments: 20
+    })
   }
 
   createGallery () {
@@ -126,35 +129,37 @@ export default class {
     this.scroll.y = this.y.current
 
     map(this.medias, (media, index) => {
+      const offsetX = this.sizes.width * 0.6
       const scaleX = media.mesh.scale.x / 2
       const scaleY = media.mesh.scale.y / 2
+      const offsetY = this.sizes.height * 0.6
       if (this.x.direction === 'left') {
         const x = media.mesh.position.x + scaleX
-        if (x < -this.sizes.width / 2) {
+        if (x < -offsetX) {
           media.extra.x += this.gallerySizes.width
           media.mesh.rotation.z = GSAP.utils.random(-Math.PI * 0.03, Math.PI * 0.03)
         }
       } else if (this.x.direction === 'right') {
         const x = media.mesh.position.x - scaleX
-        if (x > this.sizes.width / 2) {
+        if (x > offsetX) {
           media.extra.x -= this.gallerySizes.width
           media.mesh.rotation.z = GSAP.utils.random(-Math.PI * 0.03, Math.PI * 0.03)
         }
       }
       if (this.y.direction === 'top') {
         const y = media.mesh.position.y + scaleY
-        if (y < -this.sizes.height / 2) {
+        if (y < -offsetY) {
           media.extra.y += this.gallerySizes.height
           media.mesh.rotation.z = GSAP.utils.random(-Math.PI * 0.03, Math.PI * 0.03)
         }
       } else if (this.y.direction === 'bottom') {
         const y = media.mesh.position.y - scaleY
-        if (y > this.sizes.height / 2) {
+        if (y > offsetY) {
           media.extra.y -= this.gallerySizes.height
           media.mesh.rotation.z = GSAP.utils.random(-Math.PI * 0.03, Math.PI * 0.03)
         }
       }
-      media.update(this.scroll)
+      media.update(this.scroll, this.speed.current)
     })
   }
 
