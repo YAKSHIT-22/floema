@@ -43,6 +43,12 @@ button {
   outline: none;
 }
 
+canvas {
+  position: relative;
+  pointer-events: none;
+  z-index: z('canvas');
+}
+
 img {
   opacity: 0;
   transition: opacity 0.4s ease;

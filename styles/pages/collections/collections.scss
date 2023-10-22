@@ -1,6 +1,6 @@
 .collections {
   @extend %page;
-
+  z-index: 0;
   // background: $color-quicksand;
   // color: $color-quarter-spanish-white;
 }
@@ -11,7 +11,7 @@
 }
 .collections__titles {
   @extend %vertical-titles;
-
+  transition: all 1s ease;
   @include media("<phone") {
     display: none;
   }
@@ -53,6 +53,7 @@
   height: 63.1rem;
   position: relative;
   width: 44.7rem;
+  visibility: hidden;
 }
 .collections__gallery__media__image {
   @extend %cover;

@@ -31,7 +31,9 @@ class App {
   }
 
   createPreloader () {
-    this.preloader = new Preloader()
+    this.preloader = new Preloader({
+      canvas: this.canvas
+    })
     this.preloader.once('completed', this.onPreLoaded.bind(this))
   }
 
@@ -60,8 +62,8 @@ class App {
   }
 
   onPreLoaded () {
-    this.preloader.destroy()
     this.onResize()
+    this.canvas.onPreloaded()
     this.page.show()
   }
 
