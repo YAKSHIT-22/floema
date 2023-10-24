@@ -28,11 +28,15 @@ export default class Gallery {
 
     this.createMedias()
 
+    this.onResize({
+      sizes: this.sizes
+    })
+
     this.group.setParent(this.scene)
   }
 
   createMedias () {
-    this.mediasElements = this.element.querySelectorAll('.about__gallery__media')
+    this.mediasElements = this.element.querySelectorAll('.about__gallery__media') // prettier-ignore
 
     this.medias = map(this.mediasElements, (element, index) => {
       return new Media({
@@ -46,6 +50,7 @@ export default class Gallery {
     })
   }
 
+  // Animations
   show () {
     map(this.medias, (media) => media.show())
   }
@@ -54,12 +59,14 @@ export default class Gallery {
     map(this.medias, (media) => media.hide())
   }
 
+  // Events
+
   onResize (e) {
     this.bounds = this.elementsWrapper.getBoundingClientRect()
 
     this.sizes = e.sizes
 
-    this.width = (this.bounds.width / window.innerWidth) * this.sizes.width
+    this.width = (this.bounds.width / window.innerWidth) * this.sizes.width // prettier-ignore }
 
     this.scroll.current = this.scroll.target = 0
 
@@ -78,10 +85,12 @@ export default class Gallery {
 
   onTouchUp ({ x, y }) {}
 
+  // Update
+
   update (scroll) {
-    if (!this.bounds) return
     const distance = (scroll.current - scroll.target) * 0.1
     const y = scroll.current / window.innerHeight
+
     if (this.scroll.current < this.scroll.target) {
       this.direction = 'right'
       this.scroll.velocity = -1
@@ -93,10 +102,11 @@ export default class Gallery {
     this.scroll.target -= this.scroll.velocity
     this.scroll.target += distance
 
-    this.scroll.current = GSAP.utils.interpolate(this.scroll.current, this.scroll.target, this.scroll.lerp)
+    this.scroll.current = GSAP.utils.interpolate(this.scroll.current, this.scroll.target, this.scroll.lerp) // prettier-ignore
 
     map(this.medias, (media, index) => {
-      const scaleX = (media.mesh.scale.x / 2) + 0.25
+      const scaleX = media.mesh.scale.x / 2 + 0.25
+
       if (this.direction === 'left') {
         const x = media.mesh.position.x + scaleX
 
@@ -110,12 +120,14 @@ export default class Gallery {
           media.extra -= this.width
         }
       }
-      // media.mesh.position.y = Math.cos((media.mesh.position.x / this.width) * Math.PI) * 75 -75
+
       media.update(this.scroll.current)
     })
+
     this.group.position.y = y * this.sizes.height
   }
 
+  // Destroy
   destroy () {
     this.scene.removeChild(this.group)
   }

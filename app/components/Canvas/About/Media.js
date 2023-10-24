@@ -1,7 +1,12 @@
+/* eslint-disable no-unused-vars */
 import { Mesh, Program } from 'ogl'
+import GSAP from 'gsap'
+
+import Detection from 'classes/Detection'
+
 import vertex from 'shaders/plane-vertex.glsl'
 import fragment from 'shaders/plane-fragment.glsl'
-import GSAP from 'gsap'
+
 export default class Media {
   constructor ({ element, geometry, gl, index, scene, sizes }) {
     this.element = element
@@ -11,18 +16,22 @@ export default class Media {
     this.index = index
     this.sizes = sizes
 
-    this.createTexture()
-    this.createProgram()
-    this.createMesh()
-
     this.extra = {
       x: 0,
       y: 0
     }
+
+    this.createTexture()
+    this.createProgram()
+    this.createMesh()
+    this.createBounds({
+      sizes: this.sizes
+    })
   }
 
   createTexture () {
     const image = this.element.querySelector('img')
+
     this.texture = window.TEXTURES[image.getAttribute('data-src')]
   }
 
@@ -56,14 +65,17 @@ export default class Media {
     this.updateY()
   }
 
+  // Animations
   show () {
-    GSAP.fromTo(this.program.uniforms.uAlpha, {
-      value: 0
-    }, {
-      delay: this.index * 0.1,
-      duration: 1,
-      value: 1
-    })
+    GSAP.fromTo(
+      this.program.uniforms.uAlpha,
+      {
+        value: 0
+      },
+      {
+        value: 1
+      }
+    )
   }
 
   hide () {
@@ -71,6 +83,8 @@ export default class Media {
       value: 0
     })
   }
+
+  // Events
 
   onResize (sizes, scroll) {
     this.extra = 0
@@ -80,8 +94,15 @@ export default class Media {
     this.updateY(0)
   }
 
+  // Loop.
   updateRotation () {
-    this.mesh.rotation.z = GSAP.utils.mapRange(-this.sizes.width / 2, this.sizes.width / 2, Math.PI * 0.1, -Math.PI * 0.1, this.mesh.position.x)
+    this.mesh.rotation.z = GSAP.utils.mapRange(
+      -this.sizes.width / 2,
+      this.sizes.width / 2,
+      Math.PI * 0.1,
+      -Math.PI * 0.1,
+      this.mesh.position.x
+    )
   }
 
   updateScale () {
@@ -91,26 +112,29 @@ export default class Media {
     this.mesh.scale.x = this.sizes.width * this.width
     this.mesh.scale.y = this.sizes.height * this.height
 
-    const scale = GSAP.utils.mapRange(0, this.sizes.width / 2, 0.05, 0, Math.abs(this.mesh.position.x))
-    this.mesh.scale.x += scale
-    this.mesh.scale.y += scale
+    // scaling logic while rotation
+    // const scale = GSAP.utils.mapRange(0, this.sizes.width / 2, 0.1, 0, Math.abs(this.mesh.position.x)) // prettier-ignore
+
+    // this.mesh.scale.x += scale
+    // this.mesh.scale.y += scale
   }
 
   updateX (x = 0) {
     this.x = (this.bounds.left + x) / window.innerWidth
 
-    this.mesh.position.x = (-this.sizes.width / 2) + (this.mesh.scale.x / 2) + (this.x * this.sizes.width) + this.extra
+    this.mesh.position.x = (-this.sizes.width / 2) + (this.mesh.scale.x / 2) + (this.x * this.sizes.width) + this.extra // prettier-ignore
   }
 
   updateY (y = 0) {
     this.y = (this.bounds.top + y) / window.innerHeight
 
-    this.mesh.position.y = (this.sizes.height / 2) - (this.mesh.scale.y / 2) - (this.y * this.sizes.height)
-    this.mesh.position.y += Math.cos((this.mesh.position.x / this.sizes.width) * Math.PI * 0.1) * 58 - 58
+    const extra = Detection.isPhone() ? 20 : 40
+
+    this.mesh.position.y = (this.sizes.height / 2) - (this.mesh.scale.y / 2) - (this.y * this.sizes.height) // prettier-ignore
+    this.mesh.position.y += Math.cos((this.mesh.position.x / this.sizes.width) * Math.PI * 0.1) * 58 - 58 // prettier-ignore
   }
 
   update (scroll) {
-    if (!this.bounds) return
     this.updateRotation()
     this.updateScale()
     this.updateX(scroll)

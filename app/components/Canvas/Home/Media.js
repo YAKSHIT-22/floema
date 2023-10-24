@@ -10,13 +10,14 @@ export default class {
     this.geometry = geometry
     this.scene = scene
     this.sizes = sizes
-    this.createTexture()
-    this.createProgram()
-    this.createMesh()
     this.extra = {
       x: 0,
       y: 0
     }
+    this.createTexture()
+    this.createProgram()
+    this.createMesh()
+    this.createBounds({ sizes: this.sizes })
   }
 
   createTexture () {
@@ -99,7 +100,6 @@ export default class {
   }
 
   update (scroll, speed) {
-    if (!this.bounds) return
     this.updateX(scroll.x)
     this.updateY(scroll.y)
     this.program.uniforms.uSpeed.value = speed

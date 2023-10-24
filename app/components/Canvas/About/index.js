@@ -14,7 +14,12 @@ export default class {
     this.createGeometry()
     this.createGalleries()
 
+    this.onResize({
+      sizes: this.sizes
+    })
+
     this.group.setParent(scene)
+
     this.show()
   }
 
@@ -37,6 +42,7 @@ export default class {
     })
   }
 
+  // Animations
   show () {
     map(this.galleries, (gallery) => gallery.show())
   }
@@ -44,6 +50,8 @@ export default class {
   hide () {
     map(this.galleries, (gallery) => gallery.hide())
   }
+
+  // Events
 
   onResize (e) {
     map(this.galleries, (gallery) => gallery.onResize(e))
@@ -63,10 +71,13 @@ export default class {
 
   onWheel ({ pixelX, pixelY }) {}
 
+  // Update
+
   update (scroll) {
     map(this.galleries, (gallery) => gallery.update(scroll))
   }
 
+  // Destroy
   destroy () {
     map(this.galleries, (gallery) => gallery.destroy())
   }
