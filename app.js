@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 const app = express()
 const path = require('path')
-const port = 3000
+const port = process.env.PORT || 3001
 
 app.use(logger('dev'))
 app.use(bodyParser.json())

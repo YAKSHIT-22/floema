@@ -67,14 +67,23 @@ class App {
     this.page.show()
   }
 
-  async onChange (url) {
+  onPopState () {
+    this.onChange({
+      url: window.location.pathname,
+      push: false
+    })
+  }
+
+  async onChange ({ url, push = true }) {
     this.canvas.onChangeStart(this.template, url)
     await this.page.hide()
     const request = await window.fetch(url)
     if (request.status === 200) {
       const html = await request.text()
       const div = document.createElement('div')
-      window.history.pushState({}, '', url)
+      if (push) {
+        window.history.pushState({}, '', url)
+      }
       div.innerHTML = html
 
       const divContent = div.querySelector('.content')
@@ -146,6 +155,7 @@ class App {
   }
 
   addEventListeners () {
+    window.addEventListener('popstate', this.onPopState.bind(this)) //
     window.addEventListener('mousedown', this.onTouchDown.bind(this))
     window.addEventListener('mousemove', this.onTouchMove.bind(this))
     window.addEventListener('mouseup', this.onTouchUp.bind(this))
@@ -162,7 +172,7 @@ class App {
       link.onclick = event => {
         event.preventDefault()
         const { href } = link
-        this.onChange(href)
+        this.onChange({ url: href })
         console.log(event, href)
       }
     })
